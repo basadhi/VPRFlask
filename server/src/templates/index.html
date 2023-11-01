@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VPR Image Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f3f3;
+        }
+        h1 {
+            text-align: center;
+            color: #007bff;
+        }
+        form {
+            max-width: 300px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        input.form-control {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        input.btn {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        input.btn:hover {
+            background-color: #0056b3;
+        }
+        #results {
+            text-align: center;
+            margin-top: 20px;
+        }
+        #similar-images {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        #similar-images img {
+            max-width: 150px;
+            max-height: 150px;
+            margin: 10px;
+        }
+    </style>
+    <script>
+        function displaySimilarImages() {
+            var resultsDiv = document.getElementById('results');
+            var similarImagesDiv = document.getElementById('similar-images');
+            resultsDiv.innerHTML = 'Loading...';
+
+            var fileInput = document.getElementById('imagefile');
+            var formData = new FormData();
+            formData.append('imagefile', fileInput.files[0]);
+
+            fetch('/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                resultsDiv.innerHTML = '';
+                similarImagesDiv.innerHTML = '';
+                data.forEach(imageUrl => {
+                    var img = document.createElement('img');
+                    img.src = imageUrl;
+                    similarImagesDiv.appendChild(img);
+                });
+            })
+            .catch(error => {
+                resultsDiv.innerHTML = 'Error: Unable to retrieve similar images.';
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>VPR Image Search</h1>
+    <form action='/' method="post" enctype="multipart/form-data" onsubmit="displaySimilarImages(); return false;">
+        <label for="imagefile">Choose an image:</label>
+        <input class="form-control" type="file" name="imagefile" id="imagefile">
+        <input class="btn" type="submit" value="Predict Image">
+    </form>
+    <div id="results">
+        <!-- Results will be displayed here -->
+    </div>
+    <div id="similar-images">
+        <!-- Similar images will be displayed here -->
+    </div>
+</body>
+</html>
