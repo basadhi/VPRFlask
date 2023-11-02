@@ -75,8 +75,8 @@
             })
             .then(response => response.json())
             .then(data => {
-                resultsDiv.innerHTML = '';
-                similarImagesDiv.innerHTML = '';
+                resultsDiv.innerHTML = ''; // Clear any previous results
+                similarImagesDiv.innerHTML = ''; // Clear any previous similar images
                 data.forEach(imageUrl => {
                     var img = document.createElement('img');
                     img.src = imageUrl;
@@ -95,6 +95,7 @@
         <label for="imagefile">Choose an image:</label>
         <input class="form-control" type="file" name="imagefile" id="imagefile">
         <input class="btn" type="submit" value="Predict Image">
+        
     </form>
     <div id="results">
         <!-- Results will be displayed here -->
@@ -102,5 +103,6 @@
     <div id="similar-images">
         <!-- Similar images will be displayed here -->
     </div>
+    <a class="btn" href="/dashboard" style="background-color: #007bff; color: #fff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block;">Go to Dashboard</a>
 </body>
 </html>
