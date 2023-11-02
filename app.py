@@ -8,6 +8,10 @@ from flask_mysqldb import MySQL
 import yaml
 import firebase_admin
 from firebase_admin import credentials, storage
+
+
+
+app = Flask(__name__)
  
 print("test 1")
 # Initialize Firebase Admin SDK
@@ -51,7 +55,12 @@ def insert_image_paths_into_mysql(image_paths):
     except Exception as e:
         return jsonify({'error': "Failed to insert image paths into the database."})
 
-
+@app.route('/add_image_paths', methods=['GET'])
+def add_image_paths():
+    print("teqst 10")
+    image_paths = get_image_paths_from_storage()
+    result = insert_image_paths_into_mysql(image_paths)
+    return result
 
 
 def read_image(image_file):
@@ -95,7 +104,7 @@ def get_image_paths(prod_ids):
     except Exception as e:
         return jsonify({'error': "Failed to fetch images form the databse."})
     
-    
+    print("koo")
     for image_path in image_paths:
         print("test 8")
         if prod_ids == image_path[0]:
@@ -106,7 +115,7 @@ def get_image_paths(prod_ids):
     return image_paths
 
 
-app = Flask(__name__)
+
 
 
 print("test 9")
@@ -120,15 +129,12 @@ app.config['MYSQL_PASSWORD'] = db['mysql_password']
 app.config['MYSQL_DB'] = db['mysql_db']
 
 mysql = MySQL(app)
+result = add_image_paths()
+print(result,"test 15")
 
 API_ENDPOINT = 'https://indexvpr-4l2dxaoo7q-uc.a.run.app'
 
-@app.route('/add_image_paths', methods=['GET'])
-def add_image_paths():
-    print("teqst 10")
-    image_paths = get_image_paths_from_storage()
-    result = insert_image_paths_into_mysql(image_paths)
-    return result
+
 
 
 @app.route('/',methods = ['GET','POST'])
