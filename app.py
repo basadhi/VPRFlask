@@ -43,17 +43,19 @@ def get_image_paths_from_storage():
 def insert_image_paths_into_mysql(image_paths):
     print("test 4")
     try:
-        cursor = mysql.connection.cursor()
-        for path in image_paths:
-            # Assuming you have a 'images' table with a 'path' column
-            query = "INSERT INTO prod_images (image_path) VALUES ;"
-            cursor.execute(query, (path,))
-        mysql.connection.commit()
-        cursor.close()
+        with app.app_context():
+            cursor = mysql.connection.cursor()
+            for path in image_paths:
+                # Assuming you have a 'images' table with a 'path' column
+                query = "INSERT INTO prod_images (image_path) VALUES ;"
+                cursor.execute(query, (path,))
+            mysql.connection.commit()
+            cursor.close()
         return "Image paths inserted into MySQL successfully."
 
     except Exception as e:
-        return jsonify({'error': "Failed to insert image paths into the database."})
+        with app.app_context():
+            return jsonify({'error': "Failed to insert image paths into the database."})
 
 @app.route('/add_image_paths', methods=['GET'])
 def add_image_paths():
@@ -128,7 +130,10 @@ app.config['MYSQL_USER'] = db['mysql_user']
 app.config['MYSQL_PASSWORD'] = db['mysql_password']
 app.config['MYSQL_DB'] = db['mysql_db']
 
-mysql = MySQL(app)
+def create_mysql_connection():
+    mysql = MySQL(app)
+    return mysql
+
 result = add_image_paths()
 print(result,"test 15")
 
@@ -184,4 +189,5 @@ def dashboard():
     return render_template('dashboard.html', power_bi_dashboard_url=power_bi_dashboard_url)
 
 if __name__ == '__main__':
+    mysql = create_mysql_connection()
     app.run(port=3000,debug=True)
