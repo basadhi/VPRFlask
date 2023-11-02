@@ -6,11 +6,50 @@ import pandas as pd
 import cv2
 from flask_mysqldb import MySQL
 import yaml
+import firebase_admin
+from firebase_admin import credentials, storage
+ 
+
+# Initialize Firebase Admin SDK
+cred = credentials.Certificate('vprimagesearch-firebase-adminsdk-rmdc1-842c646ae3.json')
+firebase_admin.initialize_app(cred, {
+    'storageBucket': 'your-storage-bucket-name.appspot.com'
+})
 
 
-
-image_folder = 'user_images'
+image_folder = 'gallery'
 os.makedirs(image_folder, exist_ok=True)
+
+def get_image_paths_from_storage():
+    bucket = storage.bucket()
+    image_paths = []
+
+    # List all files in the Firebase Storage bucket
+    blobs = bucket.list_blobs()
+    for blob in blobs:
+        # Assuming your images are in a specific directory or have a naming pattern
+        if blob.name.startswith('images/'):
+            image_paths.append(blob.name)
+
+    return image_paths
+
+
+# Function to insert image paths into MySQL
+def insert_image_paths_into_mysql(image_paths):
+    try:
+        cursor = mysql.connection.cursor()
+        for image_path in image_paths:
+            # Assuming you have a 'images' table with a 'path' column
+            query = "INSERT INTO images (path) VALUES (%s);"
+            cursor.execute(query, (image_path,))
+        mysql.connection.commit()
+        cursor.close()
+        return "Image paths inserted into MySQL successfully."
+
+    except Exception as e:
+        return jsonify({'error': "Failed to insert image paths into the database."})
+
+
 
 
 def read_image(image_file):
@@ -72,6 +111,13 @@ app.config['MYSQL_DB'] = db['mysql_db']
 mysql = MySQL(app)
 
 API_ENDPOINT = 'https://indexvpr-4l2dxaoo7q-uc.a.run.app'
+
+@app.route('/add_image_paths', methods=['GET'])
+def add_image_paths():
+    image_paths = get_image_paths_from_storage()
+    result = insert_image_paths_into_mysql(image_paths)
+    return result
+
 
 @app.route('/',methods = ['GET','POST'])
 
