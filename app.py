@@ -13,7 +13,7 @@ print("test 1")
 # Initialize Firebase Admin SDK
 cred = credentials.Certificate('vprimagesearch-firebase-adminsdk-rmdc1-842c646ae3.json')
 firebase_admin.initialize_app(cred, {
-    'storageBucket': 'your-storage-bucket-name.appspot.com'
+    'storageBucket': 'vprimagesearch.appspot.com'
 })
 print("test 2" )
 
@@ -29,8 +29,8 @@ def get_image_paths_from_storage():
     blobs = bucket.list_blobs()
     for blob in blobs:
         # Assuming your images are in a specific directory or have a naming pattern
-        if blob.name.startswith('images/'):
-            image_paths.append(blob.name)
+        
+        image_paths.append(blob.name)
 
     return image_paths
 
@@ -42,7 +42,7 @@ def insert_image_paths_into_mysql(image_paths):
         cursor = mysql.connection.cursor()
         for path in image_paths:
             # Assuming you have a 'images' table with a 'path' column
-            query = "INSERT INTO prod_images (image_path) VALUES (%s);"
+            query = "INSERT INTO prod_images (image_path) VALUES ;"
             cursor.execute(query, (path,))
         mysql.connection.commit()
         cursor.close()
@@ -138,14 +138,15 @@ def index():
         print("test 11")
 
         uploaded_image = request.files['imagefile']
-        print(request.files)
-        print(uploaded_image)
+        print(request.files,"test 12")
+        print(uploaded_image,"test 13")
 
         if uploaded_image:
 
             files = {'file' : ('uploaded_image',uploaded_image)}
 
             response = requests.post(API_ENDPOINT,files=files)
+            print("test 14")
 
             if response.status_code == 200:
                 similar_images = response.json()
@@ -160,7 +161,7 @@ def index():
             else:
                 return "Error: Unable to retrieve similar images from the model API."
 
-    return render_template('index.html')
+        return render_template('index.html')
 
 
 
