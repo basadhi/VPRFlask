@@ -9,18 +9,19 @@ import yaml
 import firebase_admin
 from firebase_admin import credentials, storage
  
-
+print("test 1")
 # Initialize Firebase Admin SDK
 cred = credentials.Certificate('vprimagesearch-firebase-adminsdk-rmdc1-842c646ae3.json')
 firebase_admin.initialize_app(cred, {
     'storageBucket': 'your-storage-bucket-name.appspot.com'
 })
-
+print("test 2" )
 
 image_folder = 'gallery'
 os.makedirs(image_folder, exist_ok=True)
 
 def get_image_paths_from_storage():
+    print("test 3")
     bucket = storage.bucket()
     image_paths = []
 
@@ -36,12 +37,13 @@ def get_image_paths_from_storage():
 
 # Function to insert image paths into MySQL
 def insert_image_paths_into_mysql(image_paths):
+    print("test 4")
     try:
         cursor = mysql.connection.cursor()
-        for image_path in image_paths:
+        for path in image_paths:
             # Assuming you have a 'images' table with a 'path' column
-            query = "INSERT INTO images (path) VALUES (%s);"
-            cursor.execute(query, (image_path,))
+            query = "INSERT INTO prod_images (image_path) VALUES (%s);"
+            cursor.execute(query, (path,))
         mysql.connection.commit()
         cursor.close()
         return "Image paths inserted into MySQL successfully."
@@ -53,6 +55,7 @@ def insert_image_paths_into_mysql(image_paths):
 
 
 def read_image(image_file):
+    print("test 5")
     img = cv2.imread(
         image_file, cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION
     )
@@ -66,6 +69,7 @@ def get_image_paths(prod_ids):
     # csv_path = './gallery.csv'  # Replace with the actual path
     # data = pd.read_csv(csv_path)
     image_paths = []
+    print("test 6")
 
     #for i, prod_id in enumerate(prod_ids):
     #     row = data[data['seller_img_id'] == prod_id]
@@ -81,8 +85,10 @@ def get_image_paths(prod_ids):
 
         result = cursor.fetchall()
         cursor.close()
+        print("test 7")
 
         image_paths = [[row[0],row[1]] for row in result]
+    
         print(image_paths)
 
     except Exception as e:
@@ -90,6 +96,7 @@ def get_image_paths(prod_ids):
     
     
     for image_path in enumerate(image_paths):
+        print("test 8")
         if prod_ids == image_path[0]:
             print(image_path[1])
             
@@ -99,6 +106,9 @@ def get_image_paths(prod_ids):
 
 
 app = Flask(__name__)
+
+
+print("test 9")
 
 #configuration of the db
 
@@ -114,6 +124,7 @@ API_ENDPOINT = 'https://indexvpr-4l2dxaoo7q-uc.a.run.app'
 
 @app.route('/add_image_paths', methods=['GET'])
 def add_image_paths():
+    print("teqst 10")
     image_paths = get_image_paths_from_storage()
     result = insert_image_paths_into_mysql(image_paths)
     return result
@@ -124,12 +135,16 @@ def add_image_paths():
 def index():
 
     if request.method == 'POST':
+        print("test 11")
 
         uploaded_image = request.files['imagefile']
+        print(request.files)
+        print(uploaded_image)
 
         if uploaded_image:
 
             files = {'file' : ('uploaded_image',uploaded_image)}
+
             response = requests.post(API_ENDPOINT,files=files)
 
             if response.status_code == 200:
