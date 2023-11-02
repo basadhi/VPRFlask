@@ -84,6 +84,7 @@ def get_image_paths(prod_ids):
         cursor.execute(query)
 
         result = cursor.fetchall()
+        print(result,"these are the sql result")
         cursor.close()
         print("test 7")
 
@@ -95,7 +96,7 @@ def get_image_paths(prod_ids):
         return jsonify({'error': "Failed to fetch images form the databse."})
     
     
-    for image_path in enumerate(image_paths):
+    for image_path in image_paths:
         print("test 8")
         if prod_ids == image_path[0]:
             print(image_path[1])
@@ -151,6 +152,7 @@ def index():
             if response.status_code == 200:
                 similar_images = response.json()
                 image_ids = similar_images['prediction']['similar_image_ids'][0]
+                print(image_ids, "these are the image ids")
 
 
                 image_paths = get_image_paths(image_ids)
