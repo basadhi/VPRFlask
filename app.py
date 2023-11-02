@@ -36,6 +36,8 @@ def get_image_paths_from_storage():
         
         image_paths.append(blob.name)
 
+    print(image_paths,"image paths")
+
     return image_paths
 
 
