@@ -161,7 +161,7 @@ def index():
             else:
                 return "Error: Unable to retrieve similar images from the model API."
 
-        return render_template('index.html')
+    return render_template('index.html')
 
 
 
