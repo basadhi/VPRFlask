@@ -59,42 +59,14 @@
             margin: 10px;
         }
     </style>
-    <script>
-        function displaySimilarImages() {
-            var resultsDiv = document.getElementById('results');
-            var similarImagesDiv = document.getElementById('similar-images');
-            resultsDiv.innerHTML = 'Loading...';
-
-            var fileInput = document.getElementById('imagefile');
-            var formData = new FormData();
-            formData.append('imagefile', fileInput.files[0]);
-
-            fetch('/', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                resultsDiv.innerHTML = ''; // Clear any previous results
-                similarImagesDiv.innerHTML = ''; // Clear any previous similar images
-                data.forEach(imageUrl => {
-                    var img = document.createElement('img');
-                    img.src = imageUrl;
-                    similarImagesDiv.appendChild(img);
-                });
-            })
-            .catch(error => {
-                resultsDiv.innerHTML = 'Error: Unable to retrieve similar images.';
-            });
-        }
-    </script>
+    
 </head>
 <body>
     <h1>VPR Image Search</h1>
     <form action='/' method="post" enctype="multipart/form-data" onsubmit="displaySimilarImages(); return false;">
         <label for="imagefile">Choose an image:</label>
         <input class="form-control" type="file" name="imagefile" id="imagefile">
-        <input class="btn" type="submit" value="Predict Image">
+        <input class="btn" type="submit" value="Predict Image" >
         
     </form>
     <div id="results">
@@ -105,5 +77,59 @@
         <!-- Similar images will be displayed here -->
     </div>
     <a class="btn" href="/dashboard" style="background-color: #007bff; color: #fff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block;">Go to Dashboard</a>
+
+    <script>
+        function displaySimilarImages() {
+            var resultsDiv = document.getElementById('results');
+            var similarImagesDiv = document.getElementById('similar-images');
+            resultsDiv.innerHTML = 'Loading...';
+            console.log('Loading...');
+
+            var fileInput = document.getElementById('imagefile');
+            var formData = new FormData();
+            formData.append('imagefile', fileInput.files[0]);
+            
+
+            fetch('/home', {
+                method: 'POST',
+                body: formData
+            })
+           
+            .then(response => response.json())
+            .then(data => {
+                resultsDiv.innerHTML = ''; // Clear any previous results
+                similarImagesDiv.innerHTML = ''; // Clear any previous similar images
+                console.log(typeof data);
+                const dataArray = Object.values(data);
+
+                if ( Array.isArray(dataArray) ) {
+                    console.log("array")
+            // Ensure data is an array and not empty
+            dataArray.forEach(imageUrl => {
+                console.log('imageUrl:');
+                console.log(imageUrl);
+                var img = document.createElement('img');
+                img.src = imageUrl;
+                img.style.maxWidth = '150px'; // Adjust image size
+                img.style.maxHeight = '150px'; // Adjust image size
+                img.style.margin = '10px'; // Adjust image margin
+                similarImagesDiv.appendChild(img);
+            });
+        } else {
+            resultsDiv.innerHTML = 'No similar images found.';
+        }
+            })
+            .catch(error => {
+                resultsDiv.innerHTML = 'Error: Unable to retrieve similar images.';
+            });
+        }
+    </script>
+
+
+
+
+
+
+
 </body>
 </html>
